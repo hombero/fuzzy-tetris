@@ -1,0 +1,367 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+	<meta charset="UTF-8" />
+	<title>Hombero's Tetris Adventure</title>
+	<script type="text/javascript" src="js/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
+var topPadding = 25;
+var blockSize = 25;
+var totalColumns = 26;
+var originColumn = totalColumns / 2;
+
+var blocks = [];
+
+
+var downStepSize = 25;
+
+var liveShape = null;
+
+function preload() {
+
+   
+
+}
+
+function create() {
+   //liveShape = getRandomShape();
+   //drawShape(liveShape);
+    //console.log(blocks);
+}
+
+function update() {
+    shapeTest(getRandomShape());
+}
+
+function columnStartInPixels(columnNum) {
+    if ( columnNum > totalColumns ) {
+        console.log("columnStartToPixel() error, columnNum > than total columns");
+        return null;
+    } else {
+        return ( columnNum - 1 ) * blockSize;
+    }
+}
+
+function drawSquare(originX, originY) {
+    var block;
+    var width = blockSize // example;
+    var height = blockSize // example;
+    var bmd = game.add.bitmapData(width, height);
+     
+    bmd.ctx.beginPath();
+    bmd.ctx.rect(10, 10, width, height);
+    bmd.ctx.fillStyle = '#ffffff';
+    bmd.ctx.fill();
+    block = game.add.sprite(originX, originY, bmd);
+    block.anchor.setTo(0, 0);
+    
+}
+
+function getRandomShape() {
+    
+    var shape = null;
+    var rand = Math.floor((Math.random() * 7) + 1);
+    
+   
+    if ( rand == 1 ) {
+        // line
+        shape = {
+            rotation: 0,
+            type: "line",
+            rotation0: [
+                [ 0, 1, 0, 0 ],
+                [ 0, 1, 0, 0 ],
+                [ 0, 1, 0, 0 ],
+                [ 0, 1, 0, 0 ]
+                ],
+            rotation90: [
+                [ 0, 0, 0, 0 ],
+                [ 1, 1, 1, 1 ],
+                [ 0, 0, 0, 0 ],
+                [ 0, 0, 0, 0 ],
+                ],
+            rotation180: [
+                [ 0, 1, 0, 0 ],
+                [ 0, 1, 0, 0 ],
+                [ 0, 1, 0, 0 ],
+                [ 0, 1, 0, 0 ]
+                ],
+            rotation270: [
+                [ 0, 0, 0, 0 ],
+                [ 1, 1, 1, 1 ],
+                [ 0, 0, 0, 0 ],
+                [ 0, 0, 0, 0 ],
+                ]
+        };
+        
+        
+        
+    } 
+    else if ( rand == 2 ) {
+        // L
+        shape = {
+            rotation: 0,
+            type: "L",
+            rotation0: [
+                [ 0, 1, 0, 0 ],
+                [ 0, 1, 0, 0 ],
+                [ 0, 1, 1, 0 ],
+                [ 0, 0, 0, 0 ]
+                ],
+            rotation90: [
+                [ 0, 0, 0, 0 ],
+                [ 0, 1, 1, 1 ],
+                [ 0, 1, 0, 0 ],
+                [ 0, 0, 0, 0 ],
+                ],
+            rotation180: [
+                [ 0, 1, 1, 0 ],
+                [ 0, 0, 1, 0 ],
+                [ 0, 0, 1, 0 ],
+                [ 0, 0, 0, 0 ]
+                ],
+            rotation270: [
+                [ 0, 0, 0, 1 ],
+                [ 0, 1, 1, 1 ],
+                [ 0, 0, 0, 0 ],
+                [ 0, 0, 0, 0 ],
+                ]
+        };
+    }
+    else if ( rand == 3 ) {
+        // J
+        shape = {
+            rotation: 0,
+                type: "J",
+                rotation0: [
+                    [ 0, 0, 1, 0 ],
+                    [ 0, 0, 1, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation90: [
+                    [ 0, 1, 0, 0 ],
+                    [ 0, 1, 1, 1 ],
+                    [ 0, 0, 0, 0 ],
+                    [ 0, 0, 0, 0 ],
+                    ],
+                rotation180: [
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 1, 0, 0 ],
+                    [ 0, 1, 0, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation270: [
+                    [ 0, 1, 1, 1 ],
+                    [ 0, 0, 0, 1 ],
+                    [ 0, 0, 0, 0 ],
+                    [ 0, 0, 0, 0 ],
+                    ]
+        };
+    }
+    else if ( rand == 4 ) {
+        // O
+        shape = {
+            rotation: 0,
+                type: "J",
+                rotation0: [
+                    [ 0, 0, 0, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation90: [
+                    [ 0, 0, 0, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation180: [
+                    [ 0, 0, 0, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation270: [
+                    [ 0, 0, 0, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ]
+        };
+    }
+    else if ( rand == 5 ) {
+        // T
+       shape = {
+            rotation: 0,
+                type: "T",
+                rotation0: [
+                    [ 0, 1, 0, 0 ],
+                    [ 1, 1, 1, 0 ],
+                    [ 0, 0, 0, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation90: [
+                    [ 0, 1, 0, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 1, 0, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation180: [
+                    [ 0, 0, 0, 0 ],
+                    [ 1, 1, 1, 0 ],
+                    [ 0, 1, 0, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation270: [
+                    [ 0, 1, 0, 0 ],
+                    [ 1, 1, 0, 0 ],
+                    [ 0, 1, 0, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ]
+        };
+        
+    }
+    else if ( rand == 6 ) {
+        // s
+        shape = {
+            rotation: 0,
+                type: "S",
+                rotation0: [
+                    [ 0, 1, 1, 0 ],
+                    [ 1, 1, 0, 0 ],
+                    [ 0, 0, 0, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation90: [
+                    [ 0, 1, 0, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 0, 1, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation180: [
+                    [ 0, 1, 1, 0 ],
+                    [ 1, 1, 0, 0 ],
+                    [ 0, 0, 0, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation270: [
+                    [ 0, 1, 0, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 0, 1, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ]
+        };
+        
+        
+    }
+    else if ( rand == 7 ) {
+        // z
+        shape = {
+            rotation: 0,
+                type: "Z",
+                rotation0: [
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 0, 1, 1 ],
+                    [ 0, 0, 0, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation90: [
+                    [ 0, 0, 1, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 1, 0, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation180: [
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 0, 1, 1 ],
+                    [ 0, 0, 0, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ],
+                rotation270: [
+                    [ 0, 0, 1, 0 ],
+                    [ 0, 1, 1, 0 ],
+                    [ 0, 1, 0, 0 ],
+                    [ 0, 0, 0, 0 ]
+                    ]
+        };
+        
+        
+    }
+    
+    
+    
+    return shape;
+}
+
+function drawShape(shape, originXCell, originYCell) {
+    console.log(shape);
+    if (shape != undefined) {
+        console.log(shape.rotation0);
+        if ( shape.rotation == 0 ) {
+           for ( var i = 0; i < shape.rotation0.length; i++ )
+           {
+              
+               for ( var j = 0; j < shape.rotation0[i].length; j++ ) {
+                   if ( shape.rotation0[i][j] == 1 ) {
+                       console.log(columnStartInPixels(originColumn) + (i * blockSize));
+                       drawSquare(columnStartInPixels(originColumn) + (j * blockSize), topPadding + (blockSize * i));
+                   }
+                   
+               }
+           }
+        }
+    }
+}
+
+function shapeTest(shape, originXCell, originYCell) {
+    var rand = Math.floor((Math.random() * 4) + 1);
+    var rotation = null;
+    if ( rand == 1) {
+        rotation = "rotation0";
+    } 
+    else if ( rand == 2 ) {
+        rotation = "rotation90";
+    }
+    else if ( rand == 3 ) {
+        rotation = "rotation180";
+    }
+    else if ( rand == 4 ) {
+        rotation = "rotation270";
+    }
+    
+    
+    if (shape != undefined) {
+        
+       
+           for ( var i = 0; i < eval("shape." + rotation).length; i++ )
+           {
+               
+              
+               for ( var j = 0; j < eval("shape." + rotation)[i].length; j++ ) {
+                   if ( eval("shape." + rotation)[i][j] == 1 ) {
+                       //console.log(columnStartInPixels(originColumn) + (i * blockSize));
+                       drawSquare(columnStartInPixels(originColumn) + (j * blockSize), topPadding + (blockSize * i));
+                   }
+                   
+               }
+           }
+        }
+   
+}
+
+</script>
+
+</body>
+</html>
