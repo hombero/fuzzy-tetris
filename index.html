@@ -17,9 +17,11 @@
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 var topPadding = 25;
-var blockSize = 25;
+
 var totalColumns = 26;
 var originColumn = totalColumns / 2;
+var columnWidth = 800 / totalColumns;
+var blockSize = columnWidth;
 
 var blocks = [];
 
@@ -28,6 +30,8 @@ var downStepSize = 25;
 
 var liveShape = null;
 
+var lastKeyPressTimer = 0;
+
 function preload() {
 
    
@@ -35,13 +39,25 @@ function preload() {
 }
 
 function create() {
-   //liveShape = getRandomShape();
-   //drawShape(liveShape);
-    //console.log(blocks);
+   liveShape = getRandomShape();
+   console.log(liveShape);
 }
 
 function update() {
-    shapeTest(getRandomShape());
+    lastKeyPressTimer++;
+    if (lastKeyPressTimer > 5) {
+         if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
+        {
+            moveShape(liveShape, -blockSize, 0);
+        }
+        if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
+        {
+            moveShape(liveShape, blockSize, 0);
+        }
+        lastKeyPressTimer = 0;
+    }
+    
+    moveShape(liveShape, 0, 1);
 }
 
 function columnStartInPixels(columnNum) {
@@ -53,18 +69,19 @@ function columnStartInPixels(columnNum) {
     }
 }
 
-function drawSquare(originX, originY) {
+function createBlock(originX, originY) {
     var block;
     var width = blockSize // example;
     var height = blockSize // example;
     var bmd = game.add.bitmapData(width, height);
      
     bmd.ctx.beginPath();
-    bmd.ctx.rect(10, 10, width, height);
+    bmd.ctx.rect(0, 0, width, height);
     bmd.ctx.fillStyle = '#ffffff';
     bmd.ctx.fill();
     block = game.add.sprite(originX, originY, bmd);
     block.anchor.setTo(0, 0);
+    return block;
     
 }
 
@@ -73,12 +90,13 @@ function getRandomShape() {
     var shape = null;
     var rand = Math.floor((Math.random() * 7) + 1);
     
+    var squares = null;
    
     if ( rand == 1 ) {
         // line
         shape = {
             rotation: 0,
-            type: "line",
+            type: "I",
             rotation0: [
                 [ 0, 1, 0, 0 ],
                 [ 0, 1, 0, 0 ],
@@ -174,7 +192,7 @@ function getRandomShape() {
         // O
         shape = {
             rotation: 0,
-                type: "J",
+                type: "O",
                 rotation0: [
                     [ 0, 0, 0, 0 ],
                     [ 0, 1, 1, 0 ],
@@ -300,66 +318,50 @@ function getRandomShape() {
         
     }
     
-    
+    shape.blocks = getBlocks(shape, originColumn, 4);
     
     return shape;
 }
 
-function drawShape(shape, originXCell, originYCell) {
+function getBlocks(shape, originXCell, originYCell) {
     console.log(shape);
-    if (shape != undefined) {
-        console.log(shape.rotation0);
-        if ( shape.rotation == 0 ) {
-           for ( var i = 0; i < shape.rotation0.length; i++ )
-           {
-              
-               for ( var j = 0; j < shape.rotation0[i].length; j++ ) {
-                   if ( shape.rotation0[i][j] == 1 ) {
-                       console.log(columnStartInPixels(originColumn) + (i * blockSize));
-                       drawSquare(columnStartInPixels(originColumn) + (j * blockSize), topPadding + (blockSize * i));
-                   }
-                   
-               }
-           }
-        }
-    }
-}
-
-function shapeTest(shape, originXCell, originYCell) {
-    var rand = Math.floor((Math.random() * 4) + 1);
-    var rotation = null;
-    if ( rand == 1) {
-        rotation = "rotation0";
-    } 
-    else if ( rand == 2 ) {
-        rotation = "rotation90";
-    }
-    else if ( rand == 3 ) {
-        rotation = "rotation180";
-    }
-    else if ( rand == 4 ) {
-        rotation = "rotation270";
-    }
-    
+    var blocks = [];
     
     if (shape != undefined) {
         
-       
-           for ( var i = 0; i < eval("shape." + rotation).length; i++ )
+        if ( shape.rotation == 0 ) {
+           for ( var i = 0; i < shape.rotation0.length; i++ )
            {
-               
-              
-               for ( var j = 0; j < eval("shape." + rotation)[i].length; j++ ) {
-                   if ( eval("shape." + rotation)[i][j] == 1 ) {
-                       //console.log(columnStartInPixels(originColumn) + (i * blockSize));
-                       drawSquare(columnStartInPixels(originColumn) + (j * blockSize), topPadding + (blockSize * i));
+               for ( var j = 0; j < shape.rotation0[i].length; j++ ) {
+                   if ( shape.rotation0[i][j] == 1 ) {
+                       
+                       blocks.push(createBlock(columnStartInPixels(originColumn) + (j * blockSize), topPadding + (blockSize * i)));
                    }
                    
                }
            }
         }
-   
+        console.log("Blocks according to getBlocks: " + blocks);
+        return blocks;
+    }
 }
+
+function moveShape(shape, deltaX, deltaY) {
+   console.log(shape.blocks);
+    for (var i = 0; i < shape.blocks.length; i++ ) {
+        if (isFinite(deltaX)) {
+            
+            shape.blocks[i].x += deltaX;
+        }
+        
+        if (isFinite(deltaX)) {
+            shape.blocks[i].y += deltaY;
+        }
+        
+        
+    }
+}
+
 
 </script>
 
